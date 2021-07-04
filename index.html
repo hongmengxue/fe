@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+			name="viewport"
+		/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>首页</title>
+		<!--外链方式引入vue-->
+		<script src="https://cdn.staticfile.org/vue/2.6.10/vue.min.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<div id="main-body">
+				<div>
+					<img class="weather_icon" :src="weather_icon" />
+					<span class="weather-text">{{weather_text}}</span>
+				</div>
+				<img class="log_pic" :src="log_pic_url" @click="ouetrClcik" />
+
+				<!--todo:请在此编写html代码，从此处往下开发即可-->
+
+				<!-- 弹出海报大图 -->
+				<div class="outer-img" v-show="isClick===true">
+					<div class="outer-content">
+						<img class="cross" src="./img/cross.png" @click="closeOuter" />
+						<img class="outer_log_pic" :src="log_pic_url" alt="" />
+						<div class="outer-down" @click="downloadImg">保存图片</div>
+					</div>
+				</div>
+
+				<!-- 打卡计时 -->
+				<span class="count-down">距离打卡结束倒计时 {{restTime}}</span>
+
+				<!-- 其他功能 -->
+				<div class="extend">
+					<div class="extend-items" v-for="(item,index) in guide" :key="index">
+						<img class="extend-img" :src="item.icon" alt="" />
+						<span class="extend-text">{{item.txt}}</span>
+					</div>
+				</div>
+
+				<!-- 精选背景 -->
+				<div class="selected-img">
+					<div class="selected-img-title">
+						<div class="title-left"></div>
+						<div class="title-right">
+							<span>精选背景</span>
+						</div>
+					</div>
+					<!-- 精选图片 -->
+					<div class="selected-img-item">
+						<div class="selected-img-items">
+							<img :src="bgImgList[0]" alt="" />
+						</div>
+						<div class="selected-img-items">
+							<!-- <div class="up-img"></div> -->
+							<div class="up-img-text">
+								<img :src="upImg" alt="" />
+								<span>自己传图</span>
+							</div>
+						</div>
+
+						<div
+							class="selected-img-items"
+							v-for="(item,index) in bgImgList.slice(1)"
+							:key="index"
+						>
+							<img :src="item" alt="" />
+						</div>
+
+						<div class="more"><span>更多美图</span></div>
+					</div>
+				</div>
+
+				<!-- 精选阅读 -->
+				<div class="read">
+					<div class="selected-img-title">
+						<div class="title-left"></div>
+						<div class="title-right">
+							<span>精选阅读</span>
+						</div>
+					</div>
+
+					<div v-for="(item, index) in readData" :key="index">
+						<div class="read-content">
+							<img class="read-img" :src="item.icon" alt="" />
+							<div class="read-title">{{item.title}}</div>
+							<span class="read-date">{{item.date}}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 底部导航栏 -->
+			<div class="tab-bar">
+				<div class="tab-bar-items" v-for="(item, index) in tabbar" :key="index">
+					<img :src="item.icon" alt="" />
+					<div class="bar-txt">{{item.txt}}</div>
+				</div>
+			</div>
+			<div class="tab"></div>
+		</div>
+		<script>
+			new Vue({
+				el: '#app',
+				data: {
+					index: '',
+					weather_icon: './img/icon_weather.png',
+					weather_text: '',
+					log_pic_url: './img/log_pic.png?1=1', //实际运用中，图片由后端返回
+
+					//精刚导航栏数据
+					guide: [
+						{ icon: './img/icon_guide1.png', txt: '换图' },
+						{ icon: './img/icon_guide2.png', txt: '提醒' },
+						{ icon: './img/icon_guide3.png', txt: '积分' },
+						{ icon: './img/icon_guide4.png', txt: '成就' },
+					],
+
+					//底部导航栏数据
+					tabbar: [
+						{ icon: './img/icon_tabbar1.png', txt: '早安' },
+						{ icon: './img/icon_tabbar2.png', txt: '排名' },
+						{ icon: './img/icon_tabbar3.png', txt: '统计' },
+						{ icon: './img/icon_tabbar4.png', txt: '我的' },
+					],
+
+					//精选图片数据
+					bgImgList: [
+						'./img/bg_img1.png',
+						'./img/bg_img2.png',
+						'./img/bg_img3.png',
+						'./img/bg_img4.png',
+						'./img/bg_img5.png',
+						'./img/bg_img6.png',
+						'./img/bg_img7.png',
+					],
+
+					//精选阅读数据
+					readData: [
+						{
+							icon: './img/read_pic1.png',
+							title: '好的界面设计并不始于图片，而是始于对人的理解',
+							date: '2021-06-12',
+						},
+						{
+							icon: './img/read_pic2.png',
+							title: '将已知的事物陌生化，更是一种创造',
+							date: '2021-06-10',
+						},
+						{
+							icon: './img/read_pic3.png',
+							title: '不要在你家里放一件你不知其用，或你认为不美的东西',
+							date: '2021-06-08',
+						},
+					],
+
+					//todo:html中需要的变量，请在此处定义
+
+					// 倒计时时间
+					restTime: '02:02:02',
+
+					// 上传图片
+					upImg: './img/icon_upload_pic.png',
+
+					time: '09:00:00',
+
+					hh: 0,
+					mm: 0,
+					ss: 0,
+
+					isClick: false,
+				},
+				created: function () {
+					//获取天气文本
+					this.getWeatherText()
+				},
+				methods: {
+					getWeatherText() {
+						this.weather_text = '江干区，小雨，气温24～31℃'
+					},
+
+					//todo:如有需要，你可以在这里编写method，实现交互或者对变量赋值
+
+					// 点击出现图片
+					ouetrClcik() {
+						this.isClick = !this.isClick
+					},
+					// 点击关闭图片
+					closeOuter() {
+						this.isClick = false
+					},
+					// 下载图片
+					downloadImg() {
+						console.log('下载图片')
+						var a = document.createElement('a')
+						a.download = name || 'pic'
+						// 设置图片地址
+						a.href = this.log_pic_url
+						a.click()
+					},
+				},
+			})
+		</script>
+		<style type="text/css" scoped>
+			#main-body {
+				margin-left: 5px;
+				margin-right: 5px;
+				margin-bottom: 60px;
+			}
+
+			/* 天气预报样式 */
+			.weather_icon {
+				width: 16px;
+				height: 16px;
+				vertical-align: -2px;
+			}
+			.weather-text {
+				font-size: 14px;
+				font-weight: 400;
+				color: #4f4f4f;
+				line-height: 20px;
+			}
+
+			/*打卡海报图样式*/
+
+			.log_pic {
+				width: 100%;
+				margin-top: 3px;
+			}
+
+			/* todo:在这里往下继续编写css */
+
+			.outer-img {
+				position: fixed;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				top: 0;
+				left: 0;
+				height: 100vh;
+				width: 100vw;
+				z-index: 99;
+				background-color: rgb(0, 0, 0, 0.8);
+				overflow: hidden;
+			}
+
+			.outer-content {
+				width: 300px;
+				/* margin: 0 auto; */
+			}
+
+			.cross {
+				width: 25px;
+				/* position: absolute; */
+				margin-left: 275px;
+			}
+
+			.outer_log_pic {
+				width: 300px;
+			}
+
+			.outer-down {
+				width: 150px;
+				height: 30px;
+				text-align: center;
+				line-height: 30px;
+				color: #ffffff;
+				border: 2px solid #fff;
+				border-radius: 50px;
+				margin-left: 150px;
+				transform: translateX(-50%);
+				margin-top: 10px;
+			}
+
+			/* 倒计时 */
+			.count-down {
+				display: block;
+				text-align: center;
+				font-size: 14px;
+				font-weight: 400;
+				line-height: 20px;
+				margin-top: 8px;
+			}
+
+			/* 扩展导航 */
+			.extend {
+				display: flex;
+				justify-content: space-around;
+				margin-top: 26px;
+			}
+
+			.extend-img {
+				width: 36px;
+				height: 36px;
+			}
+
+			.extend-text {
+				display: block;
+				text-align: center;
+				font-size: 12px;
+				color: #4f4f4f;
+				margin-top: 2px;
+			}
+
+			/* 精选背景 */
+
+			.selected-img-title {
+				margin-top: 24px;
+				margin-bottom: 14px;
+				position: relative;
+			}
+			.title-left {
+				width: 6px;
+				height: 35px;
+				background-color: #f3cf56;
+				position: absolute;
+				left: -13px;
+				top: 3px;
+			}
+			.title-right {
+				width: 171px;
+				height: 40px;
+				background: linear-gradient(
+					90deg,
+					rgba(243, 207, 86, 0.24) 0%,
+					rgba(255, 255, 255, 0.5) 100%
+				);
+				border-radius: 5px;
+				display: flex;
+				justify-content: flex-start;
+			}
+			.title-right > span {
+				font-size: 18px;
+				font-weight: 400;
+				color: #4f4f4f;
+				line-height: 25px;
+				height: 25px;
+				width: 77px;
+				margin: 6px 0 0 9px;
+			}
+
+			/* 精选图片 */
+			.selected-img-item {
+				display: flex;
+				flex-flow: wrap;
+				flex-direction: column;
+				height: 752px;
+				position: relative;
+			}
+
+			.selected-img-items:nth-child(2n) {
+				order: 2;
+			}
+			.selected-img-items:nth-child(2n + 1) {
+				order: 1;
+			}
+
+			.selected-img-item > img {
+				width: 172px;
+				height: 172px;
+			}
+
+			.selected-img-items {
+				margin-top: 16px;
+				display: flex;
+				flex-flow: row;
+				flex-direction: column;
+				margin-right: 5px;
+				counter-increment: item-counter;
+			}
+
+			.up-img-text {
+				width: 170px;
+				height: 77px;
+				background: rgba(243, 207, 86, 0.05);
+				border-radius: 5px;
+				border: 2px dotted #f3cf56;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: #f3cf56;
+				font-size: 18px;
+				/* position: relative;
+				left: 175px; */
+			}
+
+			/* 更多美图 */
+			.more {
+				width: 172px;
+				height: 69px;
+				background: #f3cf56;
+				border-radius: 5px;
+				position: absolute;
+				bottom: 0px;
+				right: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.more span {
+				width: 72px;
+				font-size: 18px;
+				font-weight: 400;
+				color: #ffffff;
+			}
+
+			.read-content {
+				height: 80px;
+				margin-bottom: 12px;
+				display: flex;
+				position: relative;
+			}
+
+			.read-title {
+				width: 218px;
+				height: 44px;
+				font-size: 16px;
+				margin-left: 12px;
+				margin-top: 8px;
+				font-size: 16px;
+				color: #4f4f4f;
+			}
+
+			.read-date {
+				font-size: 12px;
+				color: #757575;
+				position: absolute;
+				bottom: 6px;
+				right: 0;
+			}
+
+			.tab-bar {
+				z-index: 9;
+				display: flex;
+				justify-content: space-around;
+				align-items: center;
+				position: fixed;
+				bottom: 0;
+				height: 60px;
+				left: 0;
+				right: 0;
+				background: #ffffff;
+				/* box-shadow: 0px 0px 16px 0px rgba(192, 192, 192, 0.04); */
+			}
+
+			.tab-bar-items {
+				font-size: 10px;
+			}
+
+			.tab-bar-items > img {
+				width: 26px;
+			}
+		</style>
+	</body>
+</html>
